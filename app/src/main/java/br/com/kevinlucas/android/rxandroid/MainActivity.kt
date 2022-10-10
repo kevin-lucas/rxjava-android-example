@@ -6,6 +6,7 @@ import android.util.Log
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Action
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,19 +22,27 @@ class MainActivity : AppCompatActivity() {
 
     fun test() {
 
-        val person: PersonModel = PersonModel("Soleimani")
+        val listPersons = mutableListOf<PersonModel>()
+        for (i in 0..9){
+            listPersons.add(PersonModel("Person $i"))
+        }
+
+        Log.i(TAG, listPersons.toString())
 
         // observavel
-        val observable: Observable<PersonModel> = Observable.just(person)
+        val observable = Observable.just(listPersons.toList())
 
         // observador
-        val observer: Observer<PersonModel> = object : Observer<PersonModel> {
+        val observer: Observer<List<PersonModel>> = object : Observer<List<PersonModel>> {
             override fun onSubscribe(d: Disposable) {
                 Log.i(TAG, "onSubscribe()")
             }
 
-            override fun onNext(t: PersonModel) {
-                Log.i(TAG, "onNext(): " + t.name)
+            override fun onNext(t: List<PersonModel>) {
+                // chama para cada pessoa por vez
+                t.forEach {
+                    Log.i(TAG, "onNext(): " + it.name)
+                }
             }
 
             override fun onError(e: Throwable) {
@@ -48,8 +57,5 @@ class MainActivity : AppCompatActivity() {
 
         //assinatura
         observable.subscribe(observer)
-
-        // emite um sinal para cada observador
-        observable.subscribe(observer) // retorna uma assinatura
     }
 }
